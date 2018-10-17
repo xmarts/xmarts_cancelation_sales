@@ -1,5 +1,19 @@
 <odoo>
   <data>
+    <record id="xmarts_cancel_sale_add_button" model="ir.ui.view">
+      <field name="name">xmarts_cancel_sale_add_button</field>
+      <field name="model">sale.order</field>
+      <field name="inherit_id" ref="sale.view_order_form"/>
+      <field name="arch" type="xml">
+        <xpath expr="//header" position="inside">
+          <button name="print_quotation" string="Print" type="object" states="pagado,entregado" class="o_sale_print"/>
+          <button name="action_quotation_send" string="Send by Email" type="object" states="pagado,entregado"/>
+          <button name="action_pagado" string="Pedido Pagado" type="object" states="sale" class="btn-primary"/>
+          <button name="comprobar_entregado" string="Comprobar entrega" type="object" states="pagado" class="btn-primary"/>
+        </xpath>
+      </field>
+    </record>
+
     <!-- explicit list view definition -->
     <!--
     <record model="ir.ui.view" id="xmarts_cancelation_sales.list">
