@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api, _
+from odoo import models, fields, api, exceptions,_
+from datetime import datetime, date, time, timedelta
+import calendar
 
 class SaleOrder(models.Model):
         _name = 'sale.order'
@@ -31,6 +33,8 @@ class SaleOrder(models.Model):
                                 ent = False
                 if ent == True:
                         return self.write({'state': 'entregado'})
+                else:
+                        raise exceptions.ValidationError('Aun hay lineas por entregar.')
 
 
 # class xmarts_cancelation_sales(models.Model):
