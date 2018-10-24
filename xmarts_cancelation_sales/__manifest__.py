@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "Cancelacion de ventas en 48 horas",
+    'name': "Cancelacion de ventas automaticas",
 
     'summary': """
-        *Cancelacion de ventas en 48 horas
+        *Cancelacion de ventas con pago inmediato de manera automatica
             -
     """,
 
     'description': """
-        Cancelación de venta en 48Hrs
+        Cancelación de ventas automaticas
     """,
 
     'author': "Pablo Osorio",
@@ -21,7 +21,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','sale'],
+    'depends': ['base','stock','sale','sale_management'],
 
     # always loaded
     'data': [
