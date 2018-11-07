@@ -51,17 +51,20 @@ class SaleOrderAutoCancel(models.Model):
                                                                         cr = self.env.cr
                                                                         sql = "update stock_move set state='cancel' where id='"+str(m.id)+"'"
                                                                         cr.execute(sql)
-                                                                        for ml in m.move_line_ids:
-                                                                                cr = self.env.cr
+                                                                        moves_to_unreserve = self.env['stock.move']
+                                                                for move in p.move_lines:
+                                                                        if move.state == 'cancel':
+                                                                                continue
+                                                                        if move.state == 'done':
+                                                                                if move.scrapped:
+                                                                                        continue
+                                                                        moves_to_unreserve |= move
+                                                                moves_to_unreserve.mapped('move_line_ids').unlink()
+                                                                        #for ml in m.move_line_ids:
+                                                                                #cr = self.env.cr
                                                                                 #sql = "update stock_move_line set state='cancel',product_uom_qty='0',product_qty='0' where id='"+str(ml.id)+"'"
-                                                                                sql = "delete from stock_move_line where id='"+str(ml.id)+"'"
-                                                                                cr.execute(sql)
-
-                                                                for ml in p.move_line_ids:
-                                                                        cr = self.env.cr
-                                                                        #sql = "update stock_move_line set state='cancel',product_uom_qty='0',product_qty='0' where id='"+str(ml.id)+"'"
-                                                                        sql = "delete from stock_move_line where id='"+str(ml.id)+"'"
-                                                                        cr.execute(sql)
+                                                                                #sql = "delete from stock_move_line where id='"+str(ml.id)+"'"
+                                                                                #cr.execute(sql)
 
                                                                 cr = self.env.cr
                                                                 sql = "update stock_picking set state='cancel' where id='"+str(p.id)+"'"

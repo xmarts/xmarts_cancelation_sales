@@ -9,10 +9,11 @@
          <!--
            <button name="%(sale.action_view_sale_advance_payment_inv)d" string="Create Invoice" type="action" context="{'default_advance_payment_method': 'percentage'}" attrs="{'invisible': ['|',('invoice_status', '!=', 'no'), ('state', 'not in', ['pagado','entregado'])]}"/>
           -->
-          <button name="action_pagado" string="Pedido Pagado" type="object" attrs="{'invisible': [('state_cancel', '!=', 'not_payed')]}" class="btn-primary"/>
+          <button name="action_pagado" string="Pedido Pagado" type="object" attrs="{'invisible': ['|',('state_cancel', '!=', 'not_payed'),('payment_term_id', '!=', 1)]}" class="btn-primary"/>
         </xpath>
         <xpath expr="//field[@name='confirmation_date']" position="after">
-          <field name="cancelacion_automatica" />
+          <field name="fecha_pago" />
+          <field name="cancelacion_automatica" attrs="{'invisible': [('payment_term_id', '!=', 1)]}" />
           <field name="state_cancel" />
         </xpath>
       </field>
@@ -46,6 +47,19 @@
       <field name="name">xmarts_cancel_sale_add_tree</field>
       <field name="model">sale.order</field>
       <field name="inherit_id" ref="sale.view_quotation_tree"/>
+      <field name="arch" type="xml">
+        <xpath expr="//field[@name='state']" position="before">
+          <field name="confirmation_date" />
+          <field name="cancelacion_automatica" />
+          <field name="state_cancel" />
+        </xpath>
+      </field>
+    </record>
+
+    <record id="xmarts_cancel_sale_add_tree_order" model="ir.ui.view">
+      <field name="name">xmarts_cancel_sale_add_tree_order</field>
+      <field name="model">sale.order</field>
+      <field name="inherit_id" ref="sale.view_order_tree"/>
       <field name="arch" type="xml">
         <xpath expr="//field[@name='state']" position="before">
           <field name="confirmation_date" />
