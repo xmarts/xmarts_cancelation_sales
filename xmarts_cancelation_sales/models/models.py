@@ -40,7 +40,7 @@ class SaleOrderAutoCancel(models.Model):
                                 fc = self.confirmation_date
                                 fechahora = datetime.strptime(fc, DATETIME_FORMAT)
                                 horas = int(self.company_id.time_to_cancel.horas)
-                                fechahora = fechahora + timedelta(seconds=horas)
+                                fechahora = fechahora + timedelta(hours=horas)
                                 self.cancelacion_automatica = fechahora
                         if self.state == 'sale': 
                                 if datetime.now() > fechahora:
@@ -53,15 +53,18 @@ class SaleOrderAutoCancel(models.Model):
                                                                         cr.execute(sql)
                                                                         for ml in m.move_line_ids:
                                                                                 cr = self.env.cr
+
+                                                                                sqlsq = "select reserved_quantity from stock_quant where location_id='"+str(ml.location_id.id)+"' and product_id='"+str(ml.product_id.id)+"'"
+                                                                                cr.execute(sqlsq)
+                                                                                resultsql = cr.fetchone()
+                                                                                reservas = float(resultsql[0])
+                                                                                reservas = reservas - ml.product_uom_qty
+                                                                                sqlsqu = "update stock_quant set reserved_quantity='"+str(reservas)+"' where location_id='"+str(ml.location_id.id)+"' and product_id='"+str(ml.product_id.id)+"'"
+                                                                                cr.execute(sqlsqu)
+
                                                                                 #sql = "update stock_move_line set state='cancel',product_uom_qty='0',product_qty='0' where id='"+str(ml.id)+"'"
                                                                                 sql = "delete from stock_move_line where id='"+str(ml.id)+"'"
                                                                                 cr.execute(sql)
-
-                                                                for ml in p.move_line_ids:
-                                                                        cr = self.env.cr
-                                                                        #sql = "update stock_move_line set state='cancel',product_uom_qty='0',product_qty='0' where id='"+str(ml.id)+"'"
-                                                                        sql = "delete from stock_move_line where id='"+str(ml.id)+"'"
-                                                                        cr.execute(sql)
 
                                                                 cr = self.env.cr
                                                                 sql = "update stock_picking set state='cancel' where id='"+str(p.id)+"'"
