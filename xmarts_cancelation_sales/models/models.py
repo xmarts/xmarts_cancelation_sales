@@ -77,10 +77,12 @@ class SaleOrderAutoCancel(models.Model):
 
                         if self.state_cancel == 'cancel' and self.state == 'sale':
                                 self.write({'state_cancel': 'not_payed'})
+
                 ent = True
                 for l in self.order_line:
                         if l.product_uom_qty != l.qty_delivered:
                                 ent = False
+                                
                 if ent == True:
                         self.write({'state_cancel': 'delivered'})
 
