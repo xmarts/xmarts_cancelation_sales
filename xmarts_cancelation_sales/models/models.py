@@ -33,16 +33,14 @@ class SaleOrderAutoCancel(models.Model):
         @api.multi
         def action_cancelacion_automatica(self):
                 DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"
-                if self.confirmation_date and self.payment_term_id.id == 1 and self.state_cancel == 'not_payed':
-                        if self.state == 'draft' or self.state == 'sent':
-                                self.cancelacion_automatica = ''
-                        else:
-                                fc = self.confirmation_date
-                                fechahora = datetime.strptime(fc, DATETIME_FORMAT)
-                                horas = int(self.company_id.time_to_cancel.horas)
-                                fechahora = fechahora + timedelta(hours=horas)
-                                self.cancelacion_automatica = fechahora
-                        if self.state == 'sale': 
+                
+                if self.confirmation_date and self.payment_term_id.id == 1 and self.state not in ['draft','sent','cancel']:
+                        fc = self.confirmation_date
+                        fechahora = datetime.strptime(fc, DATETIME_FORMAT)
+                        horas = int(self.company_id.time_to_cancel.horas)
+                        fechahora = fechahora + timedelta(hours=horas)
+                        self.cancelacion_automatica = fechahora
+                        if self.state == 'sale' and self.state_cancel == 'not_payed' : 
                                 if datetime.now() > fechahora:
                                         if self.picking_ids:
                                                 for p in self.picking_ids:
@@ -77,6 +75,8 @@ class SaleOrderAutoCancel(models.Model):
 
                         if self.state_cancel == 'cancel' and self.state == 'sale':
                                 self.write({'state_cancel': 'not_payed'})
+                        if self.state in ['draft','sent','cancel']:
+                                self.cancelacion_automatica = ''
 
                 ent = True
                 for l in self.order_line:
@@ -134,6 +134,8 @@ class AutoCancelStockPicking(models.Model):
         ('to_delivery', 'Para Entrega'),
         ('delivered', 'Entregado'),
         ('cancel', 'Cancelado por tiempo')], string='Estado del pedido', readonly=True, related='sale_id.state_cancel')
+
+        fecha_pago = fields.Datetime(string="Fecha de autorización de entrega",readonly=True, related="sale_id.fecha_pago")
 
         @api.multi
         def button_validate(self):
